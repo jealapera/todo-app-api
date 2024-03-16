@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 
-const mongoURI = "mongodb://127.0.0.1:27017/todo-app";
+const mongoURI = process.env.DATABASE;
 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 

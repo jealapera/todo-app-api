@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../config");
+const { jwtSecret, jwtExpiry} = require("../config");
 const { validationResult } = require('express-validator');
 const User = require("../models/userModel");
 
 function generateToken(userId) {
-  return jwt.sign({ userId }, jwtSecret, { expiresIn: "1h" });
+  return jwt.sign({ userId }, jwtSecret, { expiresIn: jwtExpiry });
 }
 
 exports.register = async (req, res) => {
