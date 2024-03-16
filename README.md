@@ -15,15 +15,10 @@ This is a simple Todo App built with Node.js and Express.
    ```bash
    npm install
 
-3. **Create .env Files**:
-  - Before running the app, make sure to create a .env file in the root directory of the project. Add the following environment variables:
+3. **Create .env File**:
+  - Before running the app, be sure to make a file named .env in the main project folder and check what's inside the config.env file.
     ```bash
     touch .env
-
-  - Add the following environment variables:
-    ```bash
-    PORT=3000
-    JWT_SECRET=
 
   - Run the ff. command on your terminal to generate a JWT_SECRET:
     ```bash
