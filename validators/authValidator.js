@@ -6,6 +6,11 @@ exports.registerValidationRules = [
     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
     .matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[0-9])(?=.*[a-z])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]+$/)
     .withMessage('Password must contain at least one uppercase letter, one special character, and be alphanumeric'),
+  body('confirmPassword').notEmpty().withMessage('Confirm Password is required')
+    .isLength({ min: 6 }).withMessage('Confirm Password must be at least 6 characters long')
+    .matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[0-9])(?=.*[a-z])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]+$/)
+    .withMessage('Confirm Password must contain at least one uppercase letter, one special character, and be alphanumeric')
+    .custom((value, {req}) => value === req.body.password).withMessage("The passwords do not match"),
 ];
 
 exports.loginValidationRules = [
