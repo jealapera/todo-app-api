@@ -1,4 +1,5 @@
 const Todo = require("./models/todoModel");
+const { success, error } = require("./util/apiResponse");
 
 const createTodo = async (req, res) => {
   const { text } = req.body;
@@ -11,9 +12,9 @@ const createTodo = async (req, res) => {
 
   try {
     const newTodo = await todo.save();
-    res.status(201).json(newTodo);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(201).json(success(res.statusCode, "New todo created.", newTodo));
+  } catch (err) {
+    res.status(400).json(error(res.statusCode, err.message));
   }
 };
 
@@ -26,9 +27,9 @@ const getAllTodos = async (req, res) => {
       status: { $ne: "deleted" },
       deleted: false,
     });
-    res.json(todos);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "", todos));
+  } catch (err) {
+    res.status(500).json(error(res.statusCode, err.message));
   }
 };
 
@@ -43,11 +44,11 @@ const getTodoById = async (req, res) => {
       deleted: false,
     });
     if (!todo) {
-      return res.status(404).json({ message: "Todo not found" });
+      return res.status(404).json(error(res.statusCode, "Todo not found"));
     }
-    res.json(todo);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "", todo));
+  } catch (err) {
+    res.status(500).json(error(res.statusCode, err.message));
   }
 };
 
@@ -62,7 +63,7 @@ const updateTodo = async (req, res) => {
       deleted: false,
     });
     if (!todo) {
-      return res.status(404).json({ message: "Todo not found" });
+      return res.status(404).json(error(res.statusCode, "Todo not found"));
     }
     if (req.body.text != null) {
       todo.text = req.body.text;
@@ -71,9 +72,9 @@ const updateTodo = async (req, res) => {
       todo.status = req.body.status;
     }
     const updatedTodo = await todo.save();
-    res.json(updatedTodo);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "Todo has been updated", updatedTodo));
+  } catch (err) {
+    res.status(400).json(error(res.statusCode, err.message));
   }
 };
 
@@ -88,18 +89,14 @@ const deleteTodo = async (req, res) => {
       deleted: false,
     });
     if (!todo) {
-      return res.status(404).json({ message: "Todo not found" });
+      return res.status(404).json(error(res.statusCode, "Todo not found"));
     }
     todo.status = "deleted";
     todo.deleted = true;
     await todo.save();
-    res.status(200).json({
-      _id: todo._id,
-      deleted: todo.deleted,
-      message: "Todo deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "Todo deleted successfully", { _id: todo._id, deleted: todo.deleted }));
+  } catch (err) {
+    res.status(500).json(error(res.statusCode, err.message));
   }
 };
 
@@ -120,9 +117,9 @@ const completeMultiTodos = async (req, res) => {
       { status: "completed" }
     );
 
-    res.status(200).json({ message: "Todos updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "Todos updated successfully", {}));
+  } catch (err) {
+    res.status(500).json(error(res.statusCode, err.message));
   }
 };
 
@@ -143,9 +140,9 @@ const deleteMultiTodos = async (req, res) => {
       { status: "deleted", deleted: true }
     );
 
-    res.status(200).json({ message: "Todos deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json(success(res.statusCode, "Todos deleted successfully", {}));
+  } catch (err) {
+    res.status(500).json(error(res.statusCode, err.message));
   }
 };
 
