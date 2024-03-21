@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { jwtSecret, jwtExpiry} = require("../config");
 const { validationResult } = require('express-validator');
 const User = require("../models/userModel");
+const { success, error } = require("../utils/apiResponse");
 
 function generateToken(userId) {
   return jwt.sign({ userId }, jwtSecret, { expiresIn: jwtExpiry });
@@ -13,7 +14,7 @@ exports.register = async (req, res) => {
       // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json(error(res.statusCode, errors.array()));
       }
   
       const { email, password } = req.body;
@@ -21,7 +22,7 @@ exports.register = async (req, res) => {
       // Check if user with provided email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        return res.status(400).json({ message: "Email already registered" });
+        return res.status(400).json(error(res.statusCode, "Email already registered"));
       }
   
       // If user doesn't exist, proceed with registration
@@ -31,10 +32,10 @@ exports.register = async (req, res) => {
       
       const token = generateToken(newUser._id);
       
-      res.status(201).json({ message: "User registered successfully.", token });
-    } catch (error) {
-      console.error("Error registering user:", error);
-      res.status(500).send("Registration failed.");
+      res.status(201).json(success(res.statusCode, "User registered successfully.", token));
+    } catch (err) {
+      console.error("Error registering user:", err);
+      res.status(500).json(error(res.statusCode, "Registration failed."));
     }
 };  
 
@@ -43,25 +44,25 @@ exports.login = async (req, res) => {
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json(error(res.statusCode, errors.array()));
     }
 
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     
     if (!user) {
-      return res.status(401).json({ message: "User is not registered" });
+      return res.status(401).json(error(res.statusCode, "User is not registered"));
     }
     
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json(error(res.statusCode, "Invalid email or password"));
     }
     
     const token = generateToken(user._id);
-    res.json({ message: "Login successful.", token });
-  } catch (error) {
-    console.error("Error logging in:", error);
-    res.status(500).send("Login failed.");
+    res.json(success(res.statusCode, "Login successfully.", token));
+  } catch (err) {
+    console.error("Error logging in:", err);
+    res.status(500).json(error(res.statusCode, "Login failed."));
   }
 };
